@@ -172,9 +172,9 @@ export interface InterviewInput {
 
 Next, we will set up custom error types to handle different kinds of errors that may occur in our application. This includes:
 
-- Database errors (e.g., connection issues, query failures)
-- Interview-related errors (e.g., invalid input, transcription failures)
-- Authentication errors (e.g., invalid sessions)
+- Database errors (for example, connection issues, query failures)
+- Interview-related errors (for example, invalid input, transcription failures)
+- Authentication errors (for example, invalid sessions)
 
 Create the following `src/errors.ts` file:
 
@@ -336,7 +336,7 @@ app.use("*", requireAuth);
 // These will be mounted under /api/v1/auth/
 api.route("/auth", configureAuthRoutes());
 
-// Mount all API routes under the version prefix (e.g. /api/v1)
+// Mount all API routes under the version prefix (for example, /api/v1)
 // This lets us make breaking changes in v2 without affecting v1 users
 app.route("/api/v1", api);
 
