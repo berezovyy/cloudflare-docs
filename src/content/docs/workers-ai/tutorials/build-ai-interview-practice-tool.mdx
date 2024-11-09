@@ -3,7 +3,7 @@ updated: 2024-11-06
 difficulty: Intermediate
 content_type: 📝 Tutorial
 pcx_content_type: tutorial
-title: Build an AI-powered Interview Practice Tool with Workers AI
+title: Build an interview practice tool with Workers AI
 products:
   - Workers
   - Workers AI
@@ -16,7 +16,7 @@ tags:
 
 import { Render, PackageManagers } from "~/components";
 
-Job interviews can be stressful, and practice is key to building confidence. While traditional mock interviews with friends or mentors are valuable, they aren't always available when you need them. In this tutorial, you'll learn how to build an AI-powered Interview Practice Tool that provides real-time feedback and helps users improve their interview skills.
+Job interviews can be stressful, and practice is key to building confidence. While traditional mock interviews with friends or mentors are valuable, they aren't always available when you need them. In this tutorial, you'll learn how to build an AI-powered Interview Practice Tool that provides real-time feedback and helps improve interview skills.
 
 By the end of this tutorial, you will have built a complete interview practice tool with the following core functionalities:
 
@@ -36,7 +36,7 @@ This tutorial demonstrates how to use multiple Cloudflare products and while man
 
 ## 1. Create a new Worker project
 
-As the first step, let's create a Cloudflare Workers project using the Create Cloudflare CLI (C3) tool and the Hono framework.
+As the first step, create a Cloudflare Workers project using the Create Cloudflare CLI (C3) tool and the Hono framework.
 
 :::note
 [Hono](https://hono.dev) is a lightweight web framework that helps build API endpoints and handle HTTP requests. This tutorial uses Hono to create and manage the application's routing and middleware components.
@@ -78,9 +78,9 @@ You can now make changes to your code and see them reflected in real-time at the
 
 ### Define TypeScript types for the interview system
 
-Now that we have our project set up, let's create the TypeScript types that will form the foundation of our interview system. These types will help us maintain type safety and provide clear interfaces for the different components of our application.
+Now that the project is set up, let's create the TypeScript types that will form the foundation of the interview system. These types will help you maintain type safety and provide clear interfaces for the different components of your application.
 
-Create a new file `src/types.ts` that will contain essential types and enums for:
+Create a new file `types.ts` that will contain essential types and enums for:
 
 - Interview skills that can be assessed (JavaScript, React, etc.)
 - Different interview positions (Junior Developer, Senior Developer, etc.)
@@ -88,10 +88,10 @@ Create a new file `src/types.ts` that will contain essential types and enums for
 - Message handling between user and AI
 - Core interview data structure
 
-```typescript
+```typescript title="src/types.ts"
 import { Context } from "hono";
 
-// Context type for our API endpoints, including environment bindings and user info
+// Context type for API endpoints, including environment bindings and user info
 export interface ApiContext {
 	Bindings: CloudflareBindings;
 	Variables: {
@@ -101,8 +101,8 @@ export interface ApiContext {
 
 export type HonoCtx = Context<ApiContext>;
 
-// List of technical skills we can assess during mock interviews.
-// We focus on popular web technologies and programming languages
+// List of technical skills you can assess during mock interviews.
+// Let's focus on popular web technologies and programming languages
 // that are commonly tested in real interviews.
 export enum InterviewSkill {
 	JavaScript = "JavaScript",
@@ -126,7 +126,7 @@ export enum InterviewTitle {
 }
 
 // Tracks the current state of an interview session.
-// This helps us manage the interview flow and show appropriate UI/actions
+// This will help you to manage the interview flow and show appropriate UI/actions
 // at each stage of the process.
 export enum InterviewStatus {
 	Created = "created", // Interview is created but not started
@@ -170,15 +170,15 @@ export interface InterviewInput {
 
 ### Configure Error Types for Different Services
 
-Next, we will set up custom error types to handle different kinds of errors that may occur in our application. This includes:
+Next, set up custom error types to handle different kinds of errors that may occur in your application. This includes:
 
 - Database errors (for example, connection issues, query failures)
 - Interview-related errors (for example, invalid input, transcription failures)
 - Authentication errors (for example, invalid sessions)
 
-Create the following `src/errors.ts` file:
+Create the following `errors.ts` file:
 
-```typescript
+```typescript title="src/errors.ts"
 export const ErrorCodes = {
 	INVALID_MESSAGE: "INVALID_MESSAGE",
 	TRANSCRIPTION_FAILED: "TRANSCRIPTION_FAILED",
@@ -228,7 +228,7 @@ export class InterviewError extends Error {
 
 ## 2. Configure Authentication Middleware and User Route
 
-First, we will implement a basic authentication system to track and identify users interacting with our AI interview practice tool. The system will use HTTP-only cookies to store usernames, allowing us to identify both the request sender and their corresponding Durable Object. This straightforward authentication approach requires users to provide a username, which is then stored securely in a cookie. This approach allows us to:
+First, you will implement a basic authentication system to track and identify users interacting with your AI interview practice tool. The system uses HTTP-only cookies to store usernames, allowing you to identify both the request sender and their corresponding Durable Object. This straightforward authentication approach requires users to provide a username, which is then stored securely in a cookie. This approach allows you to:
 
 - Identify users across requests
 - Associate interview sessions with specific users
@@ -238,9 +238,9 @@ First, we will implement a basic authentication system to track and identify use
 
 First, create a middleware function that will check for the presence of a valid authentication cookie. This middleware will be used to protect routes that require authentication.
 
-Create a new file `src/middleware/auth.ts`:
+Create a new middleware file `middleware/auth.ts`:
 
-```typescript
+```typescript title="src/middleware/auth.ts"
 import { Context } from "hono";
 import { getCookie } from "hono/cookie";
 import { UnauthorizedError } from "../errors";
@@ -267,9 +267,9 @@ This middleware:
 
 ### Create Authentication Routes
 
-Next, create the authentication routes that will handle user login. Create a new file `src/routes/auth.ts`:
+Next, create the authentication routes that will handle user login. Create a new file `routes/auth.ts`:
 
-```typescript
+```typescript title="src/routes/auth.ts"
 import { Context, Hono } from "hono";
 import { setCookie } from "hono/cookie";
 import { BadRequestError } from "../errors";
@@ -314,7 +314,7 @@ export const configureAuthRoutes = () => {
 
 Finally, update main application file to include the authentication routes. Modify `src/index.ts`:
 
-```typescript
+```typescript title="src/index.ts"
 import { configureAuthRoutes } from "./routes/auth";
 import { Hono } from "hono";
 import { logger } from "hono/logger";
@@ -351,7 +351,7 @@ Now we have a basic authentication system that:
 
 ## 3. Create a Durable Object to Manage Interview
 
-Now that we have our authentication system in place, let's create a Durable Object to manage interview sessions. Durable Objects are perfect for our interview practice tool because they provide:
+Now that you have your authentication system in place, create a Durable Object to manage interview sessions. Durable Objects are perfect for the interview practice tool because they provide:
 
 - Maintains state between connections, so users can reconnect without losing progress
 - Comes with a powerful SQLite database to store all interview Q&A, feedback and metrics
@@ -361,8 +361,7 @@ Now that we have our authentication system in place, let's create a Durable Obje
 
 First, let's configure the Durable Object in `wrangler.toml` file. Add the following configuration:
 
-```toml
-# ...prev code
+```toml title="wrangler.toml"
 [[durable_objects.bindings]]
 name = "INTERVIEW"
 class_name = "Interview"
@@ -372,9 +371,9 @@ tag = "v1"
 new_sqlite_classes = ["Interview"]
 ```
 
-Next, create a new file `src/interview.ts` to define our Interview Durable Object:
+Next, create a new file `interview.ts` to define our Interview Durable Object:
 
-```typescript
+```typescript title="src/interview.ts"
 import { DurableObject } from "cloudflare:workers";
 
 export class Interview extends DurableObject<CloudflareBindings> {
@@ -416,10 +415,8 @@ export class Interview extends DurableObject<CloudflareBindings> {
 
 Now we need to export the Durable Object in our main `src/index.ts` file:
 
-```typescript
+```typescript title="src/index.ts"
 import { Interview } from "./interview";
-
-// ... previous code ...
 
 export { Interview };
 
@@ -434,20 +431,20 @@ npm run cf-typegen
 
 ### Set up SQLite Database Schema
 
-For data persistence, we'll use SQLite at the Durable Object level. This approach gives each user their own isolated database instance. We'll create two main tables:
+Let's use SQLite at the Durable Object level for data persistence. This gives each user their own isolated database instance. You'll need two main tables:
 
 - `interviews`: Stores interview session data
 - `messages`: Stores all messages exchanged during interviews
 
-Let's create a service class to handle database operations, it will encapsulate all database operations, making it easier to:
+But before you create these tables, create a service class to handle your database operations. This encapsulates database logic and helps you:
 
 - Manage database schema changes
 - Handle errors consistently
 - Keep database queries organized
 
-Create a new file called `src/services/InterviewDatabaseService.ts`:
+Create a new file called `services/InterviewDatabaseService.ts`:
 
-```typescript
+```typescript title="src/services/InterviewDatabaseService.ts"
 import {
 	InterviewData,
 	Message,
@@ -540,9 +537,9 @@ export class InterviewDatabaseService {
 }
 ```
 
-Now, let's update our Interview Durable Object to use this database service. Update `src/interview.ts`:
+Update your Interview Durable Object to use the database service by modifying `src/interview.ts`:
 
-```typescript
+```typescript title="src/interview.ts"
 import { InterviewDatabaseService } from "./services/InterviewDatabaseService";
 
 export class Interview extends DurableObject<CloudflareBindings> {
@@ -561,14 +558,10 @@ export class Interview extends DurableObject<CloudflareBindings> {
 }
 ```
 
-Let's add methods to create new interviews and retrieve existing ones. Add these methods to `src/services/InterviewDatabaseService.ts`:
+Add methods to create and retrieve interviews in `services/InterviewDatabaseService.ts`:
 
-```typescript
-// ... previous code ...
-
+```typescript title="src/services/InterviewDatabaseService.ts"
 export class InterviewDatabaseService {
-	// ... previous methods ...
-
 	/**
 	 * Creates a new interview session in the database.
 	 *
@@ -789,9 +782,9 @@ export class InterviewDatabaseService {
 }
 ```
 
-Next, we'll add RPC methods to our Interview Durable Object to expose database operations through our API. Add the following code to `src/interview.ts`:
+Add RPC methods to Interview Durable Object to expose database operations through API. Add this code to `src/interview.ts`:
 
-```typescript
+```typescript title="src/interview.ts"
 import {
 	InterviewData,
 	InterviewTitle,
@@ -800,8 +793,6 @@ import {
 } from "./types";
 
 export class Interview extends DurableObject<CloudflareBindings> {
-	// ... previous code ...
-
 	// Creates a new interview session
 	createInterview(title: InterviewTitle, skills: InterviewSkill[]): string {
 		return this.db.createInterview(title, skills);
@@ -838,14 +829,14 @@ export class Interview extends DurableObject<CloudflareBindings> {
 
 ### Create REST API Endpoints
 
-Now that we have our Durable Object and database service set up, let's create REST API endpoints to manage interviews. We'll create routes for:
+With your Durable Object and database service ready, create REST API endpoints to manage interviews. You'll need endpoints to:
 
-- Creating new interviews
-- Retrieving all interviews for a user
+- Create new interviews
+- Retrieve all interviews for a user
 
-First, let's create a new file for our interview routes. Create `src/routes/interview.ts`:
+Create a new file for your interview routes at `routes/interview.ts`:
 
-```typescript
+```typescript title="src/routes/interview.ts"
 import { Hono } from "hono";
 import { BadRequestError } from "../errors";
 import {
@@ -933,9 +924,9 @@ export const configureInterviewRoutes = () => {
 The `getInterviewDO` helper function uses the username from our authentication cookie to create a unique Durable Object ID. This ensures each user has their own isolated interview state.
 :::
 
-Now, let's update our main application file to include these routes and protect them with our authentication middleware. Update `src/index.ts`:
+Update your main application file to include the routes and protect them with authentication middleware. Update `src/index.ts`:
 
-```typescript
+```typescript title="src/index.ts"
 import { configureAuthRoutes } from "./routes/auth";
 import { configureInterviewRoutes } from "./routes/interview";
 import { Hono } from "hono";
@@ -982,9 +973,9 @@ curl http://localhost:8787/api/v1/interviews \
 
 ### Set up WebSocket handler
 
-Now that we have our basic interview management system in place, let's add real-time communication capabilities using WebSockets. We'll use Durable Objects to maintain WebSocket connections and handle real-time message processing.
+Now that you have your basic interview management system in place, let's add real-time communication capabilities using WebSockets. You'll use Durable Objects to maintain WebSocket connections and handle real-time message processing.
 
-First, let's update our Interview Durable Object to handle WebSocket connections. Update `src/interview.ts`:
+First, update Interview Durable Object to handle WebSocket connections. Update `src/interview.ts`:
 
 ```typescript
 export class Interview extends DurableObject<CloudflareBindings> {
@@ -1067,9 +1058,9 @@ export class Interview extends DurableObject<CloudflareBindings> {
 }
 ```
 
-Next, update the interview routes to include a WebSocket endpoint. Add the following to `src/routes/interview.ts`:
+Next, update the interview routes to include a WebSocket endpoint. Add the following to `routes/interview.ts`:
 
-```typescript
+```typescript title="src/routes/interview.ts"
 // ... previous code ...
 const streamInterviewProcess = async (ctx: HonoCtx) => {
 	const interviewDO = getInterviewDO(ctx);
@@ -1086,16 +1077,16 @@ export const configureInterviewRoutes = () => {
 };
 ```
 
-The WebSocket system we've built provides several key features for real-time interview interactions:
+The WebSocket system provides real-time communication features for interview practice tool:
 
 - Each interview session gets its own dedicated WebSocket connection, allowing seamless communication between the candidate and AI interviewer
 - The Durable Object maintains the connection state, ensuring no messages are lost even if the client temporarily disconnects
-- To keep connections stable, we automatically respond to ping messages with pongs, preventing timeouts
+- To keep connections stable, it automatically responds to ping messages with pongs, preventing timeouts
 - Candidates and interviewers receive instant updates as the interview progresses, creating a natural conversational flow
 
 ## 4. Add audio processing capabilities with Workers AI
 
-Now that we have our WebSocket connection set up, let's add speech-to-text capabilities using Workers AI. We'll use Cloudflare's Whisper model to transcribe audio in real-time during the interview.
+Now that WebSocket connection set up, the next step is to add speech-to-text capabilities using Workers AI. Let's use Cloudflare's Whisper model to transcribe audio in real-time during the interview.
 
 The audio processing pipeline will work like this:
 
@@ -1106,11 +1097,9 @@ The audio processing pipeline will work like this:
 5. We immediately send the transcription back to the client
 6. The client receives a notification that the AI interviewer is generating a response
 
-This approach ensures a smooth, interactive experience while maintaining the natural flow of conversation in the interview.
-
 ### Create Audio Processing Pipeline
 
-Now let's update our Interview Durable Object to handle binary audio data. We'll need to:
+Now let's update Interview Durable Object to handle binary audio data:
 
 1. Detects binary audio data sent through WebSocket
 2. Creates a unique message ID for tracking the processing status
@@ -1118,9 +1107,9 @@ Now let's update our Interview Durable Object to handle binary audio data. We'll
 4. Includes error handling for failed audio processing
 5. Broadcasts status updates to all connected clients
 
-First, let's update our Interview Durable Object to handle binary WebSocket messages. Add the following methods to your `src/interview.ts` file:
+First, let's update Interview Durable Object to handle binary WebSocket messages. Add the following methods to your `src/interview.ts` file:
 
-```typescript
+```typescript title="src/interview.ts"
 // ... previous code ...
 /**
  * Handles incoming WebSocket messages, both binary audio data and text messages.
@@ -1196,13 +1185,13 @@ private handleWebSocketError(ws: WebSocket, error: unknown): void {
 
 ```
 
-The `handleBinaryAudio` method currently just logs the receipt of audio data. In the next section, we'll add the actual transcription functionality using Workers AI's Whisper model.
+Your `handleBinaryAudio` method currently logs when it receives audio data. Next, you'll enhance it to transcribe speech using Workers AI's Whisper model.
 
 ### Configure speech-to-text
 
-As we have our audio processing pipeline set up, let's integrate Workers AI's Whisper model for speech-to-text transcription. We'll create an AI service class to handle all AI-related operations, including both speech recognition and response generation.
+Now that audio processing pipeline is set up, let's integrate Workers AI's Whisper model for speech-to-text transcription.
 
-First, we need to configure the Worker AI binding in our `wrangler.toml` file. Add the following configuration `wrangler.toml`:
+First, configure the Worker AI binding in your `wrangler.toml` file by adding:
 
 ```toml
 # ... previous configuration ...
@@ -1210,15 +1199,15 @@ First, we need to configure the Worker AI binding in our `wrangler.toml` file. A
 binding = "AI"
 ```
 
-Next, we need to generate TypeScript types for our AI binding. Run the following command:
+Next, you need to generate TypeScript types for our AI binding. Run the following command:
 
 ```sh
 npm run cf-typegen
 ```
 
-Now, let's create a new service class for AI operations. Create a new file called `src/services/AIService.ts`:
+Now, let's create a new service class for AI operations. Create a new file called `services/AIService.ts`:
 
-```typescript
+```typescript title="src/services/AIService.ts"
 import { InterviewError, ErrorCodes } from "../errors";
 
 export class AIService {
@@ -1246,14 +1235,12 @@ export class AIService {
 }
 ```
 
-Now, let's update our Interview Durable Object to use this new AI service. Update the handleBinaryAudio method in `src/interview.ts`:
+Now, let's update Interview Durable Object to use this new AI service. Update the handleBinaryAudio method in `src/interview.ts`:
 
-```typescript
-// ... previous code ...
+```typescript title="src/interview.ts"
 import { AIService } from "./services/AIService";
 
 export class Interview extends DurableObject<CloudflareBindings> {
-// ... previous code ...
 private readonly aiService: AIService;
 
 constructor(state: DurableObjectState, env: Env) {
@@ -1300,14 +1287,14 @@ private async handleBinaryAudio(ws: WebSocket, audioData: ArrayBuffer): Promise<
 ```
 
 :::note
-The Whisper model we're using (@cf/openai/whisper-tiny-en) is optimized for English speech recognition. If you need support for other languages, you can use different Whisper model variants available through Workers AI.
+The Whisper model `@cf/openai/whisper-tiny-en` is optimized for English speech recognition. If you need support for other languages, you can use different Whisper model variants available through Workers AI.
 :::
 
 Now when users speak during the interview, their audio will be automatically transcribed and stored as messages in the interview session. The transcribed text will be immediately available to both the user and the AI interviewer for generating appropriate responses.
 
 ## 5. Integrate AI response generation
 
-As we have audio transcription working, let's implement the AI interviewer response generation using Workers AI's LLM capabilities. We'll create an intelligent interview system that:
+Now that you have audio transcription working, let's implement AI interviewer response generation using Workers AI's LLM capabilities. You'll create an interview system that:
 
 - Maintains context of the conversation
 - Provides relevant follow-up questions
@@ -1316,19 +1303,19 @@ As we have audio transcription working, let's implement the AI interviewer respo
 
 ### 5.1. Set up Workers AI LLM integration
 
-First, let's enhance our `AIService` class to handle LLM interactions. We'll add methods for:
+First, let's enhance `AIService` class to handle LLM interactions. You will need to add methods for:
 
 - Processing interview context
 - Generating appropriate responses
 - Handling conversation flow
 
-Update the `src/services/AIService.ts` class to include LLM functionality:
+Update the `services/AIService.ts` class to include LLM functionality:
 
-```typescript
+```typescript title="src/services/AIService.ts"
 import { InterviewData, Message } from "../types";
 
 export class AIService {
-// ... previous code ...
+
 async processLLMResponse(interview: InterviewData): Promise<string> {
   const messages = this.prepareLLMMessages(interview);
 
@@ -1367,18 +1354,18 @@ private prepareLLMMessages(interview: InterviewData) {
 The @cf/meta/llama-2-7b-chat-int8 model is optimized for chat-like interactions and provides good performance while maintaining reasonable resource usage.
 :::
 
-### 5.2. Design conversation prompt engineering
+### 5.2. Create conversation prompt
 
-Prompt engineering is crucial for getting high-quality responses from the LLM. We'll create a system prompt that:
+Prompt engineering is crucial for getting high-quality responses from the LLM. Next, you will create a system prompt that:
 
 - Sets the context for the interview
 - Defines the interviewer's role and behavior
 - Specifies the technical focus areas
 - Guides the conversation flow
 
-Add the following method to your `src/services/AIService.ts` Class:
+Add the following method to your `services/AIService.ts` class:
 
-```typescript
+```typescript title="src/services/AIService.ts"
 private createSystemPrompt(interview: InterviewData): string {
   const basePrompt = "You are conducting a technical interview.";
   const rolePrompt = `The position is for ${interview.title}.`;
@@ -1391,7 +1378,7 @@ private createSystemPrompt(interview: InterviewData): string {
 
 ### 5.3. Implement response generation logic
 
-Finally, let's integrate the LLM response generation into our interview flow. We'll update the `handleBinaryAudio` method in the `src/interview.ts` Durable Object to:
+Finally, let's integrate the LLM response generation into the interview flow. Update the `handleBinaryAudio` method in the `src/interview.ts` Durable Object to:
 
 - Process transcribed user responses
 - Generate appropriate AI interviewer responses
@@ -1399,7 +1386,7 @@ Finally, let's integrate the LLM response generation into our interview flow. We
 
 Update the `handleBinaryAudio` method in `src/interview.ts`:
 
-```typescript
+```typescript title="src/interview.ts"
 private async handleBinaryAudio(ws: WebSocket, audioData: ArrayBuffer): Promise<void> {
   try {
     // Convert raw audio buffer to uint8 array for processing
@@ -1467,12 +1454,12 @@ private async handleBinaryAudio(ws: WebSocket, audioData: ArrayBuffer): Promise<
 
 ## Conclusion
 
-In this tutorial, we've built a sophisticated AI interview practice tool that showcases the power of Cloudflare's serverless platform. By combining Workers AI and Durable Objects, we created a tool that:
+You've successfully built an AI-powered interview practice tool using Cloudflare's Workers AI. Let's review what you've accomplished:
 
-- Users can speak naturally and system processes speech using Whisper
-- Generates contextual responses with LLM for realistic interview scenarios
-- Maintains persistent state and conversation history with Durable Objects
-- The conversation flow feels natural and professional
+- Created a real-time WebSocket communication system using Durable Objects
+- Implemented speech-to-text processing with Workers AI Whisper model
+- Built an intelligent interview system using Workers AI LLM capabilities
+- Designed a persistent storage system with SQLite in Durable Objects
 
-The complete source code is available on GitHub:
+The complete source code for this tutorial is available on GitHub:
 [ai-interview-practice-tool](https://github.com/berezovyy/ai-interview-practice-tool)
