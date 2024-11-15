@@ -330,7 +330,6 @@ const api = new Hono<ApiContext>();
 // Set up global middleware that runs on every request
 // - Logger gives us visibility into what is happening
 app.use("*", logger());
-app.use("*", requireAuth);
 
 // Wire up all our authentication routes (login, etc)
 // These will be mounted under /api/v1/auth/
@@ -417,6 +416,8 @@ Now we need to export the Durable Object in our main `src/index.ts` file:
 
 ```typescript title="src/index.ts"
 import { Interview } from "./interview";
+
+// ... previous code ...
 
 export { Interview };
 
@@ -846,6 +847,7 @@ import {
 	InterviewTitle,
 	InterviewSkill,
 } from "../types";
+import { requireAuth } from "../middleware/auth";
 
 /**
  * Gets the Interview Durable Object instance for a given user.
@@ -914,6 +916,7 @@ const createInterview = async (ctx: HonoCtx) => {
  */
 export const configureInterviewRoutes = () => {
 	const router = new Hono<ApiContext>();
+	router.use("*", requireAuth);
 	router.get("/", getAllInterviews);
 	router.post("/", createInterview);
 	return router;
@@ -935,7 +938,7 @@ import type { ApiContext } from "./types";
 const app = new Hono<ApiContext>();
 const api = new Hono<ApiContext>();
 
-app.use("", logger());
+app.use("*", logger());
 
 api.route("/auth", configureAuthRoutes());
 api.route("/interviews", configureInterviewRoutes());
